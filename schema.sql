@@ -248,6 +248,8 @@ CREATE TABLE IF NOT EXISTS reports (
     KEY idx_reports_duplicate_of_report_id (duplicate_of_report_id),
     KEY idx_reports_converted_incident_id (converted_incident_id),
     KEY idx_reports_location (latitude, longitude),
+    KEY idx_reports_reported_at (reported_at),
+    KEY idx_reports_confidence_score (confidence_score),
     CONSTRAINT fk_reports_submitted_by
         FOREIGN KEY (submitted_by) REFERENCES users (id)
         ON UPDATE CASCADE
@@ -277,6 +279,7 @@ CREATE TABLE IF NOT EXISTS report_votes (
     PRIMARY KEY (id),
     UNIQUE KEY uq_report_votes_user_report (user_id, report_id),
     KEY idx_report_votes_report_id (report_id),
+    KEY idx_report_votes_vote_type (vote_type),
     CONSTRAINT fk_report_votes_user
         FOREIGN KEY (user_id) REFERENCES users (id)
         ON UPDATE CASCADE
@@ -301,6 +304,7 @@ CREATE TABLE IF NOT EXISTS report_moderation_actions (
     KEY idx_rma_performed_by (performed_by),
     KEY idx_rma_target_report_id (target_report_id),
     KEY idx_rma_target_incident_id (target_incident_id),
+    KEY idx_rma_created_at (created_at),
     CONSTRAINT fk_rma_report
         FOREIGN KEY (report_id) REFERENCES reports (id)
         ON UPDATE CASCADE

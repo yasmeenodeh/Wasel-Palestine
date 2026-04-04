@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuditLogEntity } from './database/entities/audit-log.entity';
 import { CheckpointStatusHistoryEntity } from './database/entities/checkpoint-status-history.entity';
 import { CheckpointEntity } from './database/entities/checkpoint.entity';
 import { IncidentCategoryEntity } from './database/entities/incident-category.entity';
@@ -8,10 +9,14 @@ import { IncidentEntity } from './database/entities/incident.entity';
 import { IncidentSeverityEntity } from './database/entities/incident-severity.entity';
 import { IncidentStatusHistoryEntity } from './database/entities/incident-status-history.entity';
 import { IncidentStatusEntity } from './database/entities/incident-status.entity';
+import { ReportModerationActionEntity } from './database/entities/report-moderation-action.entity';
+import { ReportEntity } from './database/entities/report.entity';
+import { ReportVoteEntity } from './database/entities/report-vote.entity';
 import { RoleEntity } from './database/entities/role.entity';
 import { UserEntity } from './database/entities/user.entity';
 import { CheckpointsModule } from './modules/checkpoints/checkpoints.module';
 import { IncidentsModule } from './modules/incidents/incidents.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
   imports: [
@@ -38,6 +43,10 @@ import { IncidentsModule } from './modules/incidents/incidents.module';
           IncidentStatusEntity,
           IncidentEntity,
           IncidentStatusHistoryEntity,
+          ReportEntity,
+          ReportVoteEntity,
+          ReportModerationActionEntity,
+          AuditLogEntity,
         ],
         synchronize: false,
         timezone: 'Z',
@@ -45,6 +54,7 @@ import { IncidentsModule } from './modules/incidents/incidents.module';
     }),
     CheckpointsModule,
     IncidentsModule,
+    ReportsModule,
   ],
 })
 export class AppModule {}
