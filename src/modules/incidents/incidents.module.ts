@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AlertsModule } from '../alerts/alerts.module';
 import { RoleHeaderGuard } from '../../common/guards/role-header.guard';
 import { CheckpointEntity } from '../../database/entities/checkpoint.entity';
 import { IncidentCategoryEntity } from '../../database/entities/incident-category.entity';
@@ -13,6 +14,7 @@ import { IncidentsService } from './incidents.service';
 
 @Module({
   imports: [
+    AlertsModule,
     TypeOrmModule.forFeature([
       IncidentEntity,
       IncidentStatusEntity,

@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AlertSubscriptionEntity } from './database/entities/alert-subscription.entity';
+import { AlertEntity } from './database/entities/alert.entity';
 import { AuditLogEntity } from './database/entities/audit-log.entity';
 import { CheckpointStatusHistoryEntity } from './database/entities/checkpoint-status-history.entity';
 import { CheckpointEntity } from './database/entities/checkpoint.entity';
@@ -14,6 +16,7 @@ import { ReportEntity } from './database/entities/report.entity';
 import { ReportVoteEntity } from './database/entities/report-vote.entity';
 import { RoleEntity } from './database/entities/role.entity';
 import { UserEntity } from './database/entities/user.entity';
+import { AlertsModule } from './modules/alerts/alerts.module';
 import { CheckpointsModule } from './modules/checkpoints/checkpoints.module';
 import { IncidentsModule } from './modules/incidents/incidents.module';
 import { ReportsModule } from './modules/reports/reports.module';
@@ -43,6 +46,8 @@ import { ReportsModule } from './modules/reports/reports.module';
           IncidentStatusEntity,
           IncidentEntity,
           IncidentStatusHistoryEntity,
+          AlertSubscriptionEntity,
+          AlertEntity,
           ReportEntity,
           ReportVoteEntity,
           ReportModerationActionEntity,
@@ -52,6 +57,7 @@ import { ReportsModule } from './modules/reports/reports.module';
         timezone: 'Z',
       }),
     }),
+    AlertsModule,
     CheckpointsModule,
     IncidentsModule,
     ReportsModule,

@@ -4,6 +4,7 @@ import { DataSource, Repository } from 'typeorm';
 import { IncidentEntity } from '../../database/entities/incident.entity';
 import { IncidentStatusHistoryEntity } from '../../database/entities/incident-status-history.entity';
 import { IncidentStatusEntity } from '../../database/entities/incident-status.entity';
+import { AlertsService } from '../alerts/alerts.service';
 import { CloseIncidentDto } from './dto/close-incident.dto';
 import { CreateIncidentDto } from './dto/create-incident.dto';
 import { ListIncidentsDto } from './dto/list-incidents.dto';
@@ -23,6 +24,7 @@ export class IncidentsService {
     private readonly incidentStatusHistoryRepository: Repository<IncidentStatusHistoryEntity>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
+    private readonly alertsService: AlertsService,
   ) {}
 
   async list(query: ListIncidentsDto) {
@@ -221,6 +223,7 @@ export class IncidentsService {
         changeReason: dto.changeReason ?? 'Incident verified',
       }),
     );
+    await this.alertsService.createAlertsForVerifiedIncident(incident.id);
 
     return this.findOne(id);
   }

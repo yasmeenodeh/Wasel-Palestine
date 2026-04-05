@@ -333,6 +333,8 @@ CREATE TABLE IF NOT EXISTS alert_subscriptions (
     PRIMARY KEY (id),
     KEY idx_alert_subscriptions_user_id (user_id),
     KEY idx_alert_subscriptions_category_id (category_id),
+    KEY idx_alert_subscriptions_is_active (is_active),
+    KEY idx_alert_subscriptions_created_at (created_at),
     CONSTRAINT fk_alert_subscriptions_user
         FOREIGN KEY (user_id) REFERENCES users (id)
         ON UPDATE CASCADE
@@ -356,6 +358,8 @@ CREATE TABLE IF NOT EXISTS alerts (
     KEY idx_alerts_subscription_id (subscription_id),
     KEY idx_alerts_incident_id (incident_id),
     KEY idx_alerts_status (status),
+    KEY idx_alerts_created_at (created_at),
+    KEY idx_alerts_sent_at (sent_at),
     CONSTRAINT fk_alerts_subscription
         FOREIGN KEY (subscription_id) REFERENCES alert_subscriptions (id)
         ON UPDATE CASCADE
