@@ -20,6 +20,7 @@ import { AlertsModule } from './modules/alerts/alerts.module';
 import { CheckpointsModule } from './modules/checkpoints/checkpoints.module';
 import { IncidentsModule } from './modules/incidents/incidents.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { RouteEstimationModule } from './modules/route-estimation/route-estimation.module';
 
 @Module({
   imports: [
@@ -53,7 +54,7 @@ import { ReportsModule } from './modules/reports/reports.module';
           ReportModerationActionEntity,
           AuditLogEntity,
         ],
-        synchronize: false,
+        synchronize: true,
         timezone: 'Z',
       }),
     }),
@@ -61,6 +62,7 @@ import { ReportsModule } from './modules/reports/reports.module';
     CheckpointsModule,
     IncidentsModule,
     ReportsModule,
+    RouteEstimationModule,
   ],
 })
 export class AppModule {}
