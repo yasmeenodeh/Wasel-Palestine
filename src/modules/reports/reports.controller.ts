@@ -2,14 +2,15 @@ import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { RoleHeaderGuard } from '../../common/guards/role-header.guard';
+import { ReportsService } from './application/reports.service';
 import { ApproveReportDto } from './dto/approve-report.dto';
 import { ConvertReportDto } from './dto/convert-report.dto';
 import { CreateReportDto } from './dto/create-report.dto';
+import { FlagReportAbuseDto } from './dto/flag-report-abuse.dto';
 import { ListReportsDto } from './dto/list-reports.dto';
 import { MergeReportDto } from './dto/merge-report.dto';
 import { RejectReportDto } from './dto/reject-report.dto';
 import { VoteReportDto } from './dto/vote-report.dto';
-import { ReportsService } from './reports.service';
 
 type RequestWithUser = {
   user?: {
@@ -87,6 +88,17 @@ export class ReportsController {
     @Req() req: RequestWithUser,
   ) {
     return this.reportsService.reject(id.toString(), dto, req.user?.id ?? 0);
+  }
+
+  @Post(':id/flag-abuse')
+  @UseGuards(RoleHeaderGuard)
+  @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+  flagAbuse(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: FlagReportAbuseDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.reportsService.flagAbuse(id.toString(), dto, req.user?.id ?? 0);
   }
 
   @Post(':id/merge')

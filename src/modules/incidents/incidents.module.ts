@@ -9,8 +9,10 @@ import { IncidentSeverityEntity } from '../../database/entities/incident-severit
 import { IncidentStatusHistoryEntity } from '../../database/entities/incident-status-history.entity';
 import { IncidentStatusEntity } from '../../database/entities/incident-status.entity';
 import { UserEntity } from '../../database/entities/user.entity';
+import { IncidentsService } from './application/incidents.service';
 import { IncidentsController } from './incidents.controller';
-import { IncidentsService } from './incidents.service';
+import { IncidentStatusService } from './domain/incident-status.service';
+import { IncidentsQueryRepository } from './infrastructure/incidents-query.repository';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { IncidentsService } from './incidents.service';
     ]),
   ],
   controllers: [IncidentsController],
-  providers: [IncidentsService, RoleHeaderGuard],
+  providers: [IncidentsService, IncidentsQueryRepository, IncidentStatusService, RoleHeaderGuard],
   exports: [IncidentsService],
 })
 export class IncidentsModule {}

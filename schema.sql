@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS wasel_palestine
+CREATE DATABASE IF NOT EXISTS advanced_wasel_palestine
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-USE wasel_palestine;
+USE advanced_wasel_palestine;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -210,25 +210,6 @@ CREATE TABLE IF NOT EXISTS incident_status_history (
         ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS incident_updates (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    incident_id BIGINT UNSIGNED NOT NULL,
-    update_text TEXT NOT NULL,
-    created_by BIGINT UNSIGNED NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY idx_incident_updates_incident_id (incident_id),
-    KEY idx_incident_updates_created_by (created_by),
-    CONSTRAINT fk_incident_updates_incident
-        FOREIGN KEY (incident_id) REFERENCES incidents (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT fk_incident_updates_created_by
-        FOREIGN KEY (created_by) REFERENCES users (id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS reports (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     submitted_by BIGINT UNSIGNED NULL,
@@ -355,6 +336,7 @@ CREATE TABLE IF NOT EXISTS alerts (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     sent_at TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (id),
+    UNIQUE KEY uq_alerts_subscription_incident (subscription_id, incident_id),
     KEY idx_alerts_subscription_id (subscription_id),
     KEY idx_alerts_incident_id (incident_id),
     KEY idx_alerts_status (status),
@@ -370,10 +352,71 @@ CREATE TABLE IF NOT EXISTS alerts (
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS route_estimations (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    start_lat DECIMAL(10,7) NOT NULL,
+    start_lng DECIMAL(10,7) NOT NULL,
+    end_lat DECIMAL(10,7) NOT NULL,
+    end_lng DECIMAL(10,7) NOT NULL,
+    estimated_distance_km DECIMAL(10,2) NOT NULL,
+    estimated_duration_minutes INT UNSIGNED NOT NULL,
+    base_duration_minutes INT UNSIGNED NOT NULL,
+    constraints_delay_minutes INT UNSIGNED NOT NULL DEFAULT 0,
+    mobility_delay_minutes INT UNSIGNED NOT NULL DEFAULT 0,
+    metadata JSON NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_route_estimations_created_at (created_at),
+    KEY idx_route_estimations_duration (estimated_duration_minutes),
+    KEY idx_route_estimations_distance (estimated_distance_km)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS route_estimation_constraints (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    route_estimation_id BIGINT UNSIGNED NOT NULL,
+    constraint_type VARCHAR(50) NOT NULL,
+    value VARCHAR(255) NULL,
+    PRIMARY KEY (id),
+    KEY idx_rec_route_estimation_id (route_estimation_id),
+    KEY idx_rec_constraint_type (constraint_type),
+    CONSTRAINT fk_rec_route_estimation
+        FOREIGN KEY (route_estimation_id) REFERENCES route_estimations (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS route_estimation_factors (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    route_estimation_id BIGINT UNSIGNED NOT NULL,
+    factor_type VARCHAR(50) NOT NULL,
+    description TEXT NOT NULL,
+    delay_minutes INT UNSIGNED NOT NULL DEFAULT 0,
+    affected_checkpoint_id BIGINT UNSIGNED NULL,
+    affected_incident_id BIGINT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_ref_route_estimation_id (route_estimation_id),
+    KEY idx_ref_factor_type (factor_type),
+    KEY idx_ref_affected_checkpoint_id (affected_checkpoint_id),
+    KEY idx_ref_affected_incident_id (affected_incident_id),
+    CONSTRAINT fk_ref_route_estimation
+        FOREIGN KEY (route_estimation_id) REFERENCES route_estimations (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ref_affected_checkpoint
+        FOREIGN KEY (affected_checkpoint_id) REFERENCES checkpoints (id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ref_affected_incident
+        FOREIGN KEY (affected_incident_id) REFERENCES incidents (id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS audit_logs (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     actor_user_id BIGINT UNSIGNED NULL,
-    action_type ENUM('create', 'update', 'verify', 'close', 'approve', 'reject', 'merge') NOT NULL,
+    action_type ENUM('create', 'update', 'verify', 'close', 'approve', 'reject', 'merge', 'flag_abuse', 'convert_to_incident') NOT NULL,
     entity_type VARCHAR(50) NOT NULL,
     entity_id BIGINT UNSIGNED NOT NULL,
     description TEXT NULL,
@@ -390,27 +433,3 @@ CREATE TABLE IF NOT EXISTS audit_logs (
         ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO roles (name, description) VALUES
-    ('admin', 'System administrator'),
-    ('moderator', 'Moderator responsible for validation and review'),
-    ('citizen', 'Citizen reporter and subscriber');
-
-INSERT IGNORE INTO incident_categories (name, description) VALUES
-    ('closure', 'Road or checkpoint closure'),
-    ('delay', 'Traffic delay or congestion'),
-    ('accident', 'Traffic or checkpoint accident'),
-    ('weather_hazard', 'Weather-related hazard'),
-    ('etc', 'Other incident type');
-
-INSERT IGNORE INTO incident_severities (name, rank_order, description) VALUES
-    ('low', 1, 'Low severity'),
-    ('medium', 2, 'Medium severity'),
-    ('high', 3, 'High severity'),
-    ('critical', 4, 'Critical severity');
-
-INSERT IGNORE INTO incident_statuses (name, description) VALUES
-    ('pending', 'Incident created and awaiting review'),
-    ('active', 'Incident is active and affecting traffic'),
-    ('verified', 'Incident has been verified'),
-    ('closed', 'Incident is resolved or closed'),
-    ('rejected', 'Incident was rejected');

@@ -2,12 +2,12 @@ import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, Us
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { RoleHeaderGuard } from '../../common/guards/role-header.guard';
+import { IncidentsService } from './application/incidents.service';
 import { CloseIncidentDto } from './dto/close-incident.dto';
 import { CreateIncidentDto } from './dto/create-incident.dto';
 import { ListIncidentsDto } from './dto/list-incidents.dto';
 import { UpdateIncidentDto } from './dto/update-incident.dto';
 import { VerifyIncidentDto } from './dto/verify-incident.dto';
-import { IncidentsService } from './incidents.service';
 
 type RequestWithUser = {
   user?: {

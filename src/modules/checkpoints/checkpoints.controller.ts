@@ -2,11 +2,11 @@ import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, Us
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { RoleHeaderGuard } from '../../common/guards/role-header.guard';
+import { CheckpointsService } from './application/checkpoints.service';
 import { CreateCheckpointDto } from './dto/create-checkpoint.dto';
 import { CreateCheckpointStatusHistoryDto } from './dto/create-checkpoint-status-history.dto';
 import { ListCheckpointsDto } from './dto/list-checkpoints.dto';
 import { UpdateCheckpointDto } from './dto/update-checkpoint.dto';
-import { CheckpointsService } from './checkpoints.service';
 
 type RequestWithUser = {
   user?: {

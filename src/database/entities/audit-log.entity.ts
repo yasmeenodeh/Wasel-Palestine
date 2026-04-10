@@ -19,9 +19,28 @@ export class AuditLogEntity {
   @Column({
     name: 'action_type',
     type: 'enum',
-    enum: ['create', 'update', 'verify', 'close', 'approve', 'reject', 'merge'],
+    enum: [
+      'create',
+      'update',
+      'verify',
+      'close',
+      'approve',
+      'reject',
+      'merge',
+      'flag_abuse',
+      'convert_to_incident',
+    ],
   })
-  actionType!: 'create' | 'update' | 'verify' | 'close' | 'approve' | 'reject' | 'merge';
+  actionType!:
+    | 'create'
+    | 'update'
+    | 'verify'
+    | 'close'
+    | 'approve'
+    | 'reject'
+    | 'merge'
+    | 'flag_abuse'
+    | 'convert_to_incident';
 
   @Column({ name: 'entity_type', type: 'varchar', length: 50 })
   entityType!: string;

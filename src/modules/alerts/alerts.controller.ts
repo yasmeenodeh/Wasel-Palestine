@@ -2,11 +2,11 @@ import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, Us
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { RoleHeaderGuard } from '../../common/guards/role-header.guard';
+import { AlertsService } from './application/alerts.service';
 import { CreateAlertSubscriptionDto } from './dto/create-alert-subscription.dto';
 import { ListAlertsDto } from './dto/list-alerts.dto';
 import { ListAlertSubscriptionsDto } from './dto/list-alert-subscriptions.dto';
 import { UpdateAlertSubscriptionDto } from './dto/update-alert-subscription.dto';
-import { AlertsService } from './alerts.service';
 
 type RequestWithUser = {
   user?: {

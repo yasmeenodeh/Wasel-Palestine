@@ -15,10 +15,15 @@ import { ReportModerationActionEntity } from './database/entities/report-moderat
 import { ReportEntity } from './database/entities/report.entity';
 import { ReportVoteEntity } from './database/entities/report-vote.entity';
 import { RoleEntity } from './database/entities/role.entity';
+import { RouteEstimationConstraintEntity } from './database/entities/route-estimation-constraint.entity';
+import { RouteEstimationFactorEntity } from './database/entities/route-estimation-factor.entity';
+import { RouteEstimationEntity } from './database/entities/route-estimation.entity';
 import { UserEntity } from './database/entities/user.entity';
 import { AlertsModule } from './modules/alerts/alerts.module';
+import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { CheckpointsModule } from './modules/checkpoints/checkpoints.module';
 import { IncidentsModule } from './modules/incidents/incidents.module';
+import { ReferenceDataModule } from './modules/reference-data/reference-data.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { RouteEstimationModule } from './modules/route-estimation/route-estimation.module';
 
@@ -36,7 +41,7 @@ import { RouteEstimationModule } from './modules/route-estimation/route-estimati
         port: Number(configService.get<string>('DB_PORT', '3306')),
         username: configService.get<string>('DB_USERNAME', 'root'),
         password: configService.get<string>('DB_PASSWORD', ''),
-        database: configService.get<string>('DB_NAME', 'wasel_palestine'),
+        database: configService.get<string>('DB_NAME', 'advanced_wasel_palestine'),
         entities: [
           RoleEntity,
           UserEntity,
@@ -52,6 +57,9 @@ import { RouteEstimationModule } from './modules/route-estimation/route-estimati
           ReportEntity,
           ReportVoteEntity,
           ReportModerationActionEntity,
+          RouteEstimationEntity,
+          RouteEstimationConstraintEntity,
+          RouteEstimationFactorEntity,
           AuditLogEntity,
         ],
         synchronize: true,
@@ -59,8 +67,10 @@ import { RouteEstimationModule } from './modules/route-estimation/route-estimati
       }),
     }),
     AlertsModule,
+    AuditLogsModule,
     CheckpointsModule,
     IncidentsModule,
+    ReferenceDataModule,
     ReportsModule,
     RouteEstimationModule,
   ],

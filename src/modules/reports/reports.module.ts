@@ -8,8 +8,10 @@ import { IncidentStatusEntity } from '../../database/entities/incident-status.en
 import { ReportModerationActionEntity } from '../../database/entities/report-moderation-action.entity';
 import { ReportEntity } from '../../database/entities/report.entity';
 import { ReportVoteEntity } from '../../database/entities/report-vote.entity';
+import { ReportsService } from './application/reports.service';
 import { ReportsController } from './reports.controller';
-import { ReportsService } from './reports.service';
+import { ReportCredibilityService } from './domain/report-credibility.service';
+import { ReportsQueryRepository } from './infrastructure/reports-query.repository';
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { ReportsService } from './reports.service';
     ]),
   ],
   controllers: [ReportsController],
-  providers: [ReportsService, RoleHeaderGuard],
+  providers: [ReportsService, ReportsQueryRepository, ReportCredibilityService, RoleHeaderGuard],
   exports: [ReportsService],
 })
 export class ReportsModule {}

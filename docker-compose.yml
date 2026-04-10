@@ -9,4 +9,4 @@ services:
       DB_PORT: 3306
       DB_USERNAME: root
       DB_PASSWORD: ""
-      DB_NAME: wasel_palestine
+      DB_NAME: advanced_wasel_palestine
