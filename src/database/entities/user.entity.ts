@@ -29,6 +29,15 @@ export class UserEntity {
   @Column({ name: 'password_hash', type: 'varchar', length: 255 })
   passwordHash!: string;
 
+  @Column({ name: 'refresh_token_hash', type: 'varchar', length: 255, nullable: true })
+  refreshTokenHash!: string | null;
+
+  @Column({ name: 'failed_login_attempts', type: 'int', unsigned: true, default: () => '0' })
+  failedLoginAttempts!: number;
+
+  @Column({ name: 'locked_until', type: 'timestamp', nullable: true })
+  lockedUntil!: Date | null;
+
   @Column({ name: 'is_active', type: 'tinyint', width: 1, default: () => '1' })
   isActive!: boolean;
 

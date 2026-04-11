@@ -94,11 +94,11 @@ export class IncidentsService {
     const verifiedStatus = await this.incidentStatusService.findByName('verified');
     const fromStatusId = incident.statusId;
 
-    incident.statusId = verifiedStatus.id;
-    incident.verifiedBy = actorUserId.toString();
-    incident.verifiedAt = new Date();
-
-    await this.incidentRepository.save(incident);
+    await this.incidentRepository.update(id, {
+      statusId: verifiedStatus.id,
+      verifiedBy: actorUserId.toString(),
+      verifiedAt: new Date(),
+    });
     await this.writeStatusHistory(
       incident.id,
       fromStatusId,
@@ -116,11 +116,11 @@ export class IncidentsService {
     const closedStatus = await this.incidentStatusService.findByName('closed');
     const fromStatusId = incident.statusId;
 
-    incident.statusId = closedStatus.id;
-    incident.closedBy = actorUserId.toString();
-    incident.closedAt = new Date();
-
-    await this.incidentRepository.save(incident);
+    await this.incidentRepository.update(id, {
+      statusId: closedStatus.id,
+      closedBy: actorUserId.toString(),
+      closedAt: new Date(),
+    });
     await this.writeStatusHistory(
       incident.id,
       fromStatusId,

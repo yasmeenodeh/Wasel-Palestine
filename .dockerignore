@@ -1,0 +1,7 @@
+node_modules
+dist
+.git
+.gitignore
+nest-stdout.log
+nest-stderr.log
+npm-debug.log

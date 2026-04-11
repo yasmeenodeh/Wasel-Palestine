@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL,
     email VARCHAR(191) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    refresh_token_hash VARCHAR(255) NULL,
+    failed_login_attempts INT UNSIGNED NOT NULL DEFAULT 0,
+    locked_until TIMESTAMP NULL DEFAULT NULL,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -148,6 +151,7 @@ CREATE TABLE IF NOT EXISTS incidents (
     KEY idx_incidents_verified_at (verified_at),
     KEY idx_incidents_closed_at (closed_at),
     KEY idx_incidents_updated_at (updated_at),
+    KEY idx_incidents_status_updated_at (status_id, updated_at),
     CONSTRAINT fk_incidents_category
         FOREIGN KEY (category_id) REFERENCES incident_categories (id)
         ON UPDATE CASCADE
@@ -220,6 +224,9 @@ CREATE TABLE IF NOT EXISTS reports (
     reported_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status ENUM('pending', 'under_review', 'approved', 'rejected', 'merged', 'converted') NOT NULL DEFAULT 'pending',
     confidence_score DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    trust_score DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    trust_status ENUM('suspicious', 'needs_review', 'trusted') NOT NULL DEFAULT 'needs_review',
+    trust_reasons JSON NULL,
     duplicate_of_report_id BIGINT UNSIGNED NULL,
     converted_incident_id BIGINT UNSIGNED NULL,
     PRIMARY KEY (id),
@@ -231,6 +238,10 @@ CREATE TABLE IF NOT EXISTS reports (
     KEY idx_reports_location (latitude, longitude),
     KEY idx_reports_reported_at (reported_at),
     KEY idx_reports_confidence_score (confidence_score),
+    KEY idx_reports_trust_score (trust_score),
+    KEY idx_reports_trust_status (trust_status),
+    KEY idx_reports_submitted_reported_at (submitted_by, reported_at),
+    KEY idx_reports_category_status_reported_at (category_id, status, reported_at),
     CONSTRAINT fk_reports_submitted_by
         FOREIGN KEY (submitted_by) REFERENCES users (id)
         ON UPDATE CASCADE
@@ -269,6 +280,70 @@ CREATE TABLE IF NOT EXISTS report_votes (
         FOREIGN KEY (report_id) REFERENCES reports (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS report_images (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    report_id BIGINT UNSIGNED NOT NULL,
+    uploaded_by BIGINT UNSIGNED NULL,
+    image_url VARCHAR(500) NOT NULL,
+    media_type ENUM('accident', 'checkpoint', 'traffic') NOT NULL,
+    caption VARCHAR(255) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_report_images_report_id (report_id),
+    KEY idx_report_images_uploaded_by (uploaded_by),
+    KEY idx_report_images_media_type (media_type),
+    CONSTRAINT fk_report_images_report
+        FOREIGN KEY (report_id) REFERENCES reports (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_report_images_uploaded_by
+        FOREIGN KEY (uploaded_by) REFERENCES users (id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS report_image_analyses (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    report_image_id BIGINT UNSIGNED NOT NULL,
+    analysis_provider VARCHAR(100) NOT NULL,
+    detected_label VARCHAR(100) NOT NULL,
+    confidence_score DECIMAL(5,2) NOT NULL,
+    summary TEXT NOT NULL,
+    severity_hint VARCHAR(50) NULL,
+    is_relevant TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_report_image_analyses_report_image_id (report_image_id),
+    KEY idx_report_image_analyses_label (detected_label),
+    CONSTRAINT fk_report_image_analyses_report_image
+        FOREIGN KEY (report_image_id) REFERENCES report_images (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS user_points_ledger (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NOT NULL,
+    report_id BIGINT UNSIGNED NULL,
+    action_type ENUM('report_approved', 'report_converted', 'trusted_report_bonus') NOT NULL,
+    points INT NOT NULL,
+    description VARCHAR(255) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_user_points_ledger_user_report_action (user_id, report_id, action_type),
+    KEY idx_user_points_ledger_user_id (user_id),
+    KEY idx_user_points_ledger_report_id (report_id),
+    KEY idx_user_points_ledger_action_type (action_type),
+    CONSTRAINT fk_user_points_ledger_user
+        FOREIGN KEY (user_id) REFERENCES users (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_user_points_ledger_report
+        FOREIGN KEY (report_id) REFERENCES reports (id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS report_moderation_actions (

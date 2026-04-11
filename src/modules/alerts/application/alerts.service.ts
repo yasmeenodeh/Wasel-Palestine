@@ -51,7 +51,7 @@ export class AlertsService {
     }
 
     const [data, total] = await qb
-      .orderBy('subscription.created_at', 'DESC')
+      .orderBy('subscription.createdAt', 'DESC')
       .skip(offset)
       .take(limit)
       .getManyAndCount();

@@ -15,6 +15,7 @@ export class ReportsQueryRepository {
     const sortFieldMap: Record<string, string> = {
       reportedAt: 'r.reported_at',
       confidenceScore: 'r.confidence_score',
+      trustScore: 'r.trust_score',
       status: 'r.status',
     };
     const sortBy = sortFieldMap[query.sortBy ?? ''] ?? 'r.reported_at';
@@ -50,6 +51,16 @@ export class ReportsQueryRepository {
       params.push(`%${query.search}%`);
     }
 
+    if (query.trustStatus) {
+      whereParts.push('r.trust_status = ?');
+      params.push(query.trustStatus);
+    }
+
+    if (query.minTrustScore) {
+      whereParts.push('r.trust_score >= ?');
+      params.push(query.minTrustScore);
+    }
+
     const whereClause = whereParts.length ? `WHERE ${whereParts.join(' AND ')}` : '';
 
     const data = await this.dataSource.query(
@@ -65,6 +76,9 @@ export class ReportsQueryRepository {
           r.reported_at AS reportedAt,
           r.status,
           r.confidence_score AS confidenceScore,
+          r.trust_score AS trustScore,
+          r.trust_status AS trustStatus,
+          r.trust_reasons AS trustReasons,
           r.duplicate_of_report_id AS duplicateOfReportId,
           r.converted_incident_id AS convertedIncidentId,
           COALESCE(SUM(CASE WHEN rv.vote_type = 'confirm' THEN 1 ELSE 0 END), 0) AS confirmVotes,
@@ -75,7 +89,8 @@ export class ReportsQueryRepository {
         ${whereClause}
         GROUP BY
           r.id, r.submitted_by, r.latitude, r.longitude, r.category_id, c.name, r.description,
-          r.reported_at, r.status, r.confidence_score, r.duplicate_of_report_id, r.converted_incident_id
+          r.reported_at, r.status, r.confidence_score, r.trust_score, r.trust_status, r.trust_reasons,
+          r.duplicate_of_report_id, r.converted_incident_id
         ORDER BY ${sortBy} ${sortOrder}
         LIMIT ? OFFSET ?
       `,

@@ -21,4 +21,12 @@ export class ListReportsDto extends PaginationQueryDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @IsOptional()
+  @IsString()
+  trustStatus?: string;
+
+  @IsOptional()
+  @IsString()
+  minTrustScore?: string;
 }

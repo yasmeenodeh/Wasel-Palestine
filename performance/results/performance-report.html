@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wasel Palestine Performance Report</title>
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --panel: #fffdf8;
+      --ink: #1f2933;
+      --muted: #52606d;
+      --line: #d9d1c3;
+      --accent: #9c6644;
+      --accent-soft: #efe1d6;
+      --good: #1f7a4d;
+      --warn: #b26b00;
+      --bad: #b42318;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 32px;
+      background: linear-gradient(180deg, #f8f4ec 0%, #efe8dc 100%);
+      color: var(--ink);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 20px 40px rgba(64, 43, 24, 0.08);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 38px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .card {
+      background: var(--accent-soft);
+      border: 1px solid #e4d2c1;
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .card h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .card strong {
+      font-size: 26px;
+      color: var(--accent);
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 14px 30px rgba(64, 43, 24, 0.05);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3ece3;
+    }
+
+    .status-good {
+      color: var(--good);
+      font-weight: 700;
+    }
+
+    .status-warn {
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .status-bad {
+      color: var(--bad);
+      font-weight: 700;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 16px;
+      }
+
+      .hero,
+      section {
+        padding: 18px;
+      }
+
+      .hero h1 {
+        font-size: 30px;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <h1>Wasel Palestine Performance Report</h1>
+      <p>k6 performance and load testing report for the Docker deployment of <strong>advanced_wasel_palestine</strong>.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Platform</h3>
+          <strong>Docker</strong>
+          <div class="small">advanced_wasel_palestine</div>
+        </div>
+        <div class="card">
+          <h3>Base URL</h3>
+          <strong>localhost:3000</strong>
+          <div class="small">NestJS API</div>
+        </div>
+        <div class="card">
+          <h3>Tool</h3>
+          <strong>k6</strong>
+          <div class="small">Load and performance testing</div>
+        </div>
+        <div class="card">
+          <h3>Scenarios</h3>
+          <strong>5</strong>
+          <div class="small">Baseline and optimized phases</div>
+        </div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Test Scope</h2>
+      <ul>
+        <li>Read-heavy workload using incident listing</li>
+        <li>Write-heavy workload using report submissions</li>
+        <li>Mixed workload</li>
+        <li>Spike testing</li>
+        <li>Sustained load testing</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Optimizations Applied</h2>
+      <ul>
+        <li>Made global throttling environment-driven so security limits do not distort benchmarking.</li>
+        <li>Added composite indexes for repeated incident listing and report submission access patterns.</li>
+        <li>Ran the optimized Docker phase with a higher throttling budget while keeping rate limiting active.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Results Summary</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Phase</th>
+            <th>Avg Response Time</th>
+            <th>p95 Latency</th>
+            <th>Throughput</th>
+            <th>Error Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Read-heavy incident listing</td>
+            <td>Baseline</td>
+            <td>12.84 ms</td>
+            <td>43.23 ms</td>
+            <td>3.96 req/s</td>
+            <td class="status-bad">74.79%</td>
+          </tr>
+          <tr>
+            <td>Read-heavy incident listing</td>
+            <td>Optimized</td>
+            <td>16.32 ms</td>
+            <td>70.32 ms</td>
+            <td>3.97 req/s</td>
+            <td class="status-good">0.00%</td>
+          </tr>
+          <tr>
+            <td>Write-heavy report submission</td>
+            <td>Baseline</td>
+            <td>155.55 ms</td>
+            <td>812.08 ms</td>
+            <td>1.85 req/s</td>
+            <td class="status-bad">41.78%</td>
+          </tr>
+          <tr>
+            <td>Write-heavy report submission</td>
+            <td>Optimized</td>
+            <td>234.91 ms</td>
+            <td>828.50 ms</td>
+            <td>1.78 req/s</td>
+            <td class="status-warn">9.94%</td>
+          </tr>
+          <tr>
+            <td>Mixed workload</td>
+            <td>Baseline</td>
+            <td>114.01 ms</td>
+            <td>776.88 ms</td>
+            <td>2.59 req/s</td>
+            <td class="status-good">0.00%</td>
+          </tr>
+          <tr>
+            <td>Mixed workload</td>
+            <td>Optimized</td>
+            <td>117.28 ms</td>
+            <td>765.35 ms</td>
+            <td>2.58 req/s</td>
+            <td class="status-good">0.00%</td>
+          </tr>
+          <tr>
+            <td>Spike testing</td>
+            <td>Baseline</td>
+            <td>10.55 ms</td>
+            <td>44.34 ms</td>
+            <td>5.43 req/s</td>
+            <td class="status-bad">99.64%</td>
+          </tr>
+          <tr>
+            <td>Spike testing</td>
+            <td>Optimized</td>
+            <td>13.45 ms</td>
+            <td>48.47 ms</td>
+            <td>5.42 req/s</td>
+            <td class="status-good">0.00%</td>
+          </tr>
+          <tr>
+            <td>Sustained load (soak testing)</td>
+            <td>Baseline</td>
+            <td>10.22 ms</td>
+            <td>25.20 ms</td>
+            <td>2.00 req/s</td>
+            <td class="status-bad">66.57%</td>
+          </tr>
+          <tr>
+            <td>Sustained load (soak testing)</td>
+            <td>Optimized</td>
+            <td>16.50 ms</td>
+            <td>65.49 ms</td>
+            <td>2.00 req/s</td>
+            <td class="status-good">0.00%</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Before / After Comparison</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Avg Delta</th>
+            <th>p95 Delta</th>
+            <th>Throughput Delta</th>
+            <th>Error Rate Delta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Read-heavy incident listing</td>
+            <td>+3.49 ms</td>
+            <td>+27.09 ms</td>
+            <td>+0.01 req/s</td>
+            <td class="status-good">-74.79%</td>
+          </tr>
+          <tr>
+            <td>Write-heavy report submission</td>
+            <td>+79.36 ms</td>
+            <td>+16.42 ms</td>
+            <td>-0.07 req/s</td>
+            <td class="status-good">-31.84%</td>
+          </tr>
+          <tr>
+            <td>Mixed workload</td>
+            <td>+3.27 ms</td>
+            <td>-11.54 ms</td>
+            <td>-0.01 req/s</td>
+            <td>0.00%</td>
+          </tr>
+          <tr>
+            <td>Spike testing</td>
+            <td>+2.90 ms</td>
+            <td>+4.13 ms</td>
+            <td>0.00 req/s</td>
+            <td class="status-good">-99.64%</td>
+          </tr>
+          <tr>
+            <td>Sustained load (soak testing)</td>
+            <td>+6.27 ms</td>
+            <td>+40.29 ms</td>
+            <td>0.00 req/s</td>
+            <td class="status-good">-66.57%</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Identified Bottlenecks</h2>
+      <ul>
+        <li>Baseline read-heavy, spike, and soak results were dominated by throttling, causing high rejection rates.</li>
+        <li>Write-heavy traffic remains the most expensive path because report submission triggers validation, duplicate checks, audit logging, and inserts.</li>
+        <li>Mixed workload still shows high p95 latency because writes pull the tail latency upward even when the error rate is zero.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Observed Limitations</h2>
+      <ul>
+        <li>The baseline run measured security throttling as much as application capacity.</li>
+        <li>The optimized write-heavy scenario still hits endpoint business rules under sustained report intake.</li>
+        <li>The report reflects local single-node Docker behavior, not a distributed production deployment.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Root Causes</h2>
+      <ul>
+        <li>Default throttler settings were too strict for benchmarking and produced artificial 429-style rejection behavior.</li>
+        <li>Report creation is a multi-step write path, so latency grows faster than read endpoints.</li>
+        <li>Listing endpoints depend on sort and filter patterns that benefit directly from indexing.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Output Files</h2>
+      <ul>
+        <li><code>performance/results/performance-report.md</code></li>
+        <li><code>performance/results/baseline/*.json</code></li>
+        <li><code>performance/results/optimized/*.json</code></li>
+        <li><code>performance/results/baseline/*.txt</code></li>
+        <li><code>performance/results/optimized/*.txt</code></li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>

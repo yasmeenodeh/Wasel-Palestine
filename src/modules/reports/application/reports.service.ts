@@ -12,10 +12,14 @@ import { AuditLogEntity } from '../../../database/entities/audit-log.entity';
 import { IncidentEntity } from '../../../database/entities/incident.entity';
 import { IncidentStatusHistoryEntity } from '../../../database/entities/incident-status-history.entity';
 import { IncidentStatusEntity } from '../../../database/entities/incident-status.entity';
+import { ReportImageAnalysisEntity } from '../../../database/entities/report-image-analysis.entity';
+import { ReportImageEntity } from '../../../database/entities/report-image.entity';
 import { ReportModerationActionEntity } from '../../../database/entities/report-moderation-action.entity';
 import { ReportEntity } from '../../../database/entities/report.entity';
 import { ReportVoteEntity } from '../../../database/entities/report-vote.entity';
+import { UserPointsLedgerEntity } from '../../../database/entities/user-points-ledger.entity';
 import { ApproveReportDto } from '../dto/approve-report.dto';
+import { AttachReportImageDto } from '../dto/attach-report-image.dto';
 import { ConvertReportDto } from '../dto/convert-report.dto';
 import { CreateReportDto } from '../dto/create-report.dto';
 import { FlagReportAbuseDto } from '../dto/flag-report-abuse.dto';
@@ -24,6 +28,10 @@ import { MergeReportDto } from '../dto/merge-report.dto';
 import { RejectReportDto } from '../dto/reject-report.dto';
 import { VoteReportDto } from '../dto/vote-report.dto';
 import { ReportCredibilityService } from '../domain/report-credibility.service';
+import { ReportImageVisionService } from '../domain/report-image-vision.service';
+import { ReportPointsService } from '../domain/report-points.service';
+import { ReportTrustService } from '../domain/report-trust.service';
+import { ReportContributorsQueryRepository } from '../infrastructure/report-contributors-query.repository';
 import { ReportsQueryRepository } from '../infrastructure/reports-query.repository';
 
 @Injectable()
@@ -43,14 +51,28 @@ export class ReportsService {
     private readonly incidentStatusRepository: Repository<IncidentStatusEntity>,
     @InjectRepository(IncidentStatusHistoryEntity)
     private readonly incidentStatusHistoryRepository: Repository<IncidentStatusHistoryEntity>,
+    @InjectRepository(ReportImageEntity)
+    private readonly reportImageRepository: Repository<ReportImageEntity>,
+    @InjectRepository(ReportImageAnalysisEntity)
+    private readonly reportImageAnalysisRepository: Repository<ReportImageAnalysisEntity>,
+    @InjectRepository(UserPointsLedgerEntity)
+    private readonly userPointsLedgerRepository: Repository<UserPointsLedgerEntity>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
     private readonly reportsQueryRepository: ReportsQueryRepository,
+    private readonly reportContributorsQueryRepository: ReportContributorsQueryRepository,
     private readonly reportCredibilityService: ReportCredibilityService,
+    private readonly reportImageVisionService: ReportImageVisionService,
+    private readonly reportPointsService: ReportPointsService,
+    private readonly reportTrustService: ReportTrustService,
   ) {}
 
   list(query: ListReportsDto) {
     return this.reportsQueryRepository.list(query);
+  }
+
+  getTopContributors(limit = 10) {
+    return this.reportContributorsQueryRepository.listTopContributors(limit);
   }
 
   async findOne(id: string) {
@@ -61,6 +83,10 @@ export class ReportsService {
         category: true,
         duplicateOfReport: true,
         convertedIncident: true,
+        images: {
+          analyses: true,
+          uploadedByUser: true,
+        },
       },
     });
 
@@ -85,11 +111,15 @@ export class ReportsService {
       reportedAt: dto.reportedAt ? new Date(dto.reportedAt) : new Date(),
       status: duplicateCandidate ? 'under_review' : 'pending',
       confidenceScore: '0.00',
+      trustScore: '0.00',
+      trustStatus: 'needs_review',
+      trustReasons: [],
       duplicateOfReportId: duplicateCandidate?.id ?? null,
       convertedIncidentId: null,
     });
 
     const savedReport = await this.reportRepository.save(report);
+    await this.refreshReportTrust(savedReport.id);
 
     await this.writeAuditLog({
       actorUserId,
@@ -103,6 +133,57 @@ export class ReportsService {
     });
 
     return this.findOne(savedReport.id);
+  }
+
+  async getImages(reportId: string) {
+    await this.findOne(reportId);
+
+    return this.reportImageRepository.find({
+      where: { reportId },
+      relations: {
+        analyses: true,
+        uploadedByUser: true,
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async attachImage(reportId: string, dto: AttachReportImageDto, actorUserId: number) {
+    const report = await this.findOne(reportId);
+    const image = await this.reportImageRepository.save(
+      this.reportImageRepository.create({
+        reportId,
+        uploadedBy: actorUserId.toString(),
+        imageUrl: dto.imageUrl.trim(),
+        mediaType: dto.mediaType,
+        caption: dto.caption?.trim() ?? null,
+      }),
+    );
+
+    const analyses = this.reportImageVisionService.analyze({
+      imageUrl: dto.imageUrl,
+      mediaType: dto.mediaType,
+      reportDescription: report.description,
+    });
+
+    if (analyses.length > 0) {
+      await this.reportImageAnalysisRepository.save(
+        analyses.map((analysis) =>
+          this.reportImageAnalysisRepository.create({
+            reportImageId: image.id,
+            analysisProvider: 'simulated_vision',
+            detectedLabel: analysis.detectedLabel,
+            confidenceScore: analysis.confidenceScore,
+            summary: analysis.summary,
+            severityHint: analysis.severityHint,
+            isRelevant: analysis.isRelevant,
+          }),
+        ),
+      );
+    }
+
+    await this.refreshReportTrust(reportId);
+    return this.getImages(reportId);
   }
 
   async vote(reportId: string, dto: VoteReportDto, actorUserId: number) {
@@ -133,6 +214,7 @@ export class ReportsService {
 
     await this.reportVoteRepository.save(vote);
     await this.recalculateConfidenceScore(reportId);
+    await this.refreshReportTrust(reportId);
 
     return {
       report: await this.findOne(reportId),
@@ -184,6 +266,8 @@ export class ReportsService {
     const report = await this.findOne(reportId);
     report.status = 'approved';
     await this.reportRepository.save(report);
+    await this.refreshReportTrust(reportId);
+    await this.awardPointsIfEligible(reportId, report.submittedBy, 'approved');
     await this.writeModerationAction(reportId, 'approved', actorUserId, dto.actionNote ?? null);
     await this.writeAuditLog({
       actorUserId,
@@ -200,6 +284,7 @@ export class ReportsService {
     const report = await this.findOne(reportId);
     report.status = 'rejected';
     await this.reportRepository.save(report);
+    await this.refreshReportTrust(reportId);
     await this.writeModerationAction(reportId, 'rejected', actorUserId, dto.actionNote ?? null);
     await this.writeAuditLog({
       actorUserId,
@@ -216,6 +301,7 @@ export class ReportsService {
     const report = await this.findOne(reportId);
     report.status = 'rejected';
     await this.reportRepository.save(report);
+    await this.refreshReportTrust(reportId);
     await this.writeModerationAction(reportId, 'flagged_abuse', actorUserId, dto.actionNote ?? null);
     await this.writeAuditLog({
       actorUserId,
@@ -239,6 +325,7 @@ export class ReportsService {
     report.status = 'merged';
     report.duplicateOfReportId = dto.targetReportId;
     await this.reportRepository.save(report);
+    await this.refreshReportTrust(reportId);
     await this.writeModerationAction(
       reportId,
       'merged',
@@ -306,6 +393,8 @@ export class ReportsService {
     report.status = 'converted';
     report.convertedIncidentId = savedIncident.id;
     await this.reportRepository.save(report);
+    await this.refreshReportTrust(reportId);
+    await this.awardPointsIfEligible(reportId, report.submittedBy, 'converted');
 
     await this.writeModerationAction(
       reportId,
@@ -441,14 +530,150 @@ export class ReportsService {
 
     const confirmVotes = Number(rows[0]?.confirmVotes ?? 0);
     const denyVotes = Number(rows[0]?.denyVotes ?? 0);
-    const confidenceScore = this.reportCredibilityService.calculateConfidenceScore(
-      confirmVotes,
-      denyVotes,
-    );
+    const confidenceScore = this.reportCredibilityService.calculateConfidenceScore(confirmVotes, denyVotes);
 
     await this.reportRepository.update(reportId, {
       confidenceScore,
     });
+  }
+
+  private async refreshReportTrust(reportId: string) {
+    const report = await this.reportRepository.findOne({
+      where: { id: reportId },
+    });
+
+    if (!report) {
+      throw new NotFoundException(`Report ${reportId} was not found.`);
+    }
+
+    const [voteRow] = await this.dataSource.query(
+      `
+        SELECT
+          COALESCE(SUM(CASE WHEN vote_type = 'confirm' THEN 1 ELSE 0 END), 0) AS confirmVotes,
+          COALESCE(SUM(CASE WHEN vote_type = 'deny' THEN 1 ELSE 0 END), 0) AS denyVotes
+        FROM report_votes
+        WHERE report_id = ?
+      `,
+      [reportId],
+    );
+
+    const [corroborationRow] = await this.dataSource.query(
+      `
+        SELECT COUNT(*) AS total
+        FROM reports
+        WHERE id <> ?
+          AND category_id = ?
+          AND submitted_by <> ?
+          AND status <> 'rejected'
+          AND ABS(latitude - ?) <= 0.01
+          AND ABS(longitude - ?) <= 0.01
+          AND ABS(TIMESTAMPDIFF(HOUR, reported_at, ?)) <= 6
+      `,
+      [
+        reportId,
+        report.categoryId,
+        report.submittedBy ?? '0',
+        Number(report.latitude),
+        Number(report.longitude),
+        report.reportedAt,
+      ],
+    );
+
+    const reporterReliability = await this.calculateReporterReliability(report.submittedBy);
+    const imageEvidenceCount = await this.reportImageRepository.count({
+      where: { reportId },
+    });
+    const trust = this.reportTrustService.assess({
+      confirmVotes: Number(voteRow?.confirmVotes ?? 0),
+      denyVotes: Number(voteRow?.denyVotes ?? 0),
+      corroboratingReportsCount: Number(corroborationRow?.total ?? 0),
+      duplicateOfReportId: report.duplicateOfReportId,
+      reporterReliability,
+      imageEvidenceCount,
+      status: report.status,
+    });
+
+    await this.reportRepository.update(reportId, {
+      trustScore: trust.trustScore,
+      trustStatus: trust.trustStatus,
+      trustReasons: trust.trustReasons,
+    });
+  }
+
+  private async calculateReporterReliability(submittedBy: string | null) {
+    if (!submittedBy) {
+      return 0;
+    }
+
+    const [row] = await this.dataSource.query(
+      `
+        SELECT
+          COUNT(*) AS totalReports,
+          COALESCE(SUM(CASE WHEN status IN ('approved', 'converted') THEN 1 ELSE 0 END), 0) AS acceptedReports,
+          COALESCE(SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END), 0) AS rejectedReports
+        FROM reports
+        WHERE submitted_by = ?
+      `,
+      [submittedBy],
+    );
+
+    const totalReports = Number(row?.totalReports ?? 0);
+    const acceptedReports = Number(row?.acceptedReports ?? 0);
+    const rejectedReports = Number(row?.rejectedReports ?? 0);
+
+    if (totalReports === 0) {
+      return 0.5;
+    }
+
+    const ratio = (acceptedReports + 1) / (acceptedReports + rejectedReports + 2);
+    return Math.max(0, Math.min(1, ratio));
+  }
+
+  private async awardPointsIfEligible(
+    reportId: string,
+    submittedBy: string | null,
+    status: 'approved' | 'converted',
+  ) {
+    if (!submittedBy) {
+      return;
+    }
+
+    const report = await this.reportRepository.findOne({
+      where: { id: reportId },
+    });
+
+    if (!report) {
+      throw new NotFoundException(`Report ${reportId} was not found.`);
+    }
+
+    const awards = this.reportPointsService.getAwards({
+      status,
+      trustStatus: report.trustStatus,
+    });
+
+    for (const award of awards) {
+      const existing = await this.userPointsLedgerRepository.findOne({
+        where: {
+          userId: submittedBy,
+          reportId,
+          actionType: award.actionType,
+        },
+      });
+
+      if (existing) {
+        continue;
+      }
+
+      await this.userPointsLedgerRepository.save(
+        this.userPointsLedgerRepository.create({
+          userId: submittedBy,
+          reportId,
+          actionType: award.actionType,
+          points: award.points,
+          description: award.description,
+        }),
+      );
+    }
   }
 
   private writeModerationAction(

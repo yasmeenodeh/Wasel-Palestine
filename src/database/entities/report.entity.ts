@@ -9,8 +9,10 @@ import {
 } from 'typeorm';
 import { IncidentCategoryEntity } from './incident-category.entity';
 import { IncidentEntity } from './incident.entity';
+import { ReportImageEntity } from './report-image.entity';
 import { ReportModerationActionEntity } from './report-moderation-action.entity';
 import { ReportVoteEntity } from './report-vote.entity';
+import { UserPointsLedgerEntity } from './user-points-ledger.entity';
 import { UserEntity } from './user.entity';
 
 @Entity({ name: 'reports' })
@@ -46,6 +48,20 @@ export class ReportEntity {
   @Column({ name: 'confidence_score', type: 'decimal', precision: 5, scale: 2, default: () => '0.00' })
   confidenceScore!: string;
 
+  @Column({ name: 'trust_score', type: 'decimal', precision: 5, scale: 2, default: () => '0.00' })
+  trustScore!: string;
+
+  @Column({
+    name: 'trust_status',
+    type: 'enum',
+    enum: ['suspicious', 'needs_review', 'trusted'],
+    default: 'needs_review',
+  })
+  trustStatus!: 'suspicious' | 'needs_review' | 'trusted';
+
+  @Column({ name: 'trust_reasons', type: 'json', nullable: true })
+  trustReasons!: string[] | null;
+
   @Column({ name: 'duplicate_of_report_id', type: 'bigint', unsigned: true, nullable: true })
   duplicateOfReportId!: string | null;
 
@@ -73,4 +89,10 @@ export class ReportEntity {
 
   @OneToMany(() => ReportModerationActionEntity, (action) => action.report)
   moderationActions!: ReportModerationActionEntity[];
+
+  @OneToMany(() => ReportImageEntity, (image) => image.report)
+  images!: ReportImageEntity[];
+
+  @OneToMany(() => UserPointsLedgerEntity, (ledger) => ledger.report)
+  pointsLedgerEntries!: UserPointsLedgerEntity[];
 }
