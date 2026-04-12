@@ -34,6 +34,18 @@ export class RouteEstimationEntity {
   @Column({ name: 'mobility_delay_minutes', type: 'int', unsigned: true, default: () => '0' })
   mobilityDelayMinutes!: number;
 
+  @Column({ name: 'route_provider', type: 'varchar', length: 50, nullable: true })
+  routeProvider!: string | null;
+
+  @Column({ name: 'route_provider_source', type: 'varchar', length: 30, nullable: true })
+  routeProviderSource!: string | null;
+
+  @Column({ name: 'weather_provider', type: 'varchar', length: 50, nullable: true })
+  weatherProvider!: string | null;
+
+  @Column({ name: 'weather_provider_source', type: 'varchar', length: 30, nullable: true })
+  weatherProviderSource!: string | null;
+
   @Column({ type: 'json', nullable: true })
   metadata!: Record<string, unknown> | null;
 

@@ -12,21 +12,54 @@ type RouteEstimationFactorRecord = {
   affectedIncidentId: string | null;
 };
 
+type ExternalRouteContext = {
+  distanceKm: number;
+  durationMinutes: number;
+  provider: string;
+  source: string;
+};
+
+type ExternalWeatherContext = {
+  provider: string;
+  source: string;
+  locationName: string | null;
+  condition: string;
+  description: string;
+  temperatureC: number | null;
+  feelsLikeC: number | null;
+  windSpeedMps: number | null;
+  rainVolumeMm: number | null;
+  visibilityMeters: number | null;
+};
+
 @Injectable()
 export class RouteEstimationResultFactory {
   constructor(private readonly routeEstimationPolicyService: RouteEstimationPolicyService) {}
 
   create(
     dto: EstimateRouteDto,
-    distanceKm: number,
+    routeContext: ExternalRouteContext,
     nearbyCheckpoints: CheckpointEntity[],
     nearbyIncidents: IncidentEntity[],
+    weatherContext: ExternalWeatherContext | null,
   ) {
-    const baseDurationMinutes =
-      this.routeEstimationPolicyService.calculateBaseDurationMinutes(distanceKm);
+    const distanceKm = routeContext.distanceKm;
+    const baseDurationMinutes = routeContext.durationMinutes > 0
+      ? routeContext.durationMinutes
+      : this.routeEstimationPolicyService.calculateBaseDurationMinutes(distanceKm);
     const constraints = this.routeEstimationPolicyService.calculateConstraintsDelay(
       dto.avoidCheckpoints,
       dto.avoidAreas,
+    );
+    const weatherImpact = this.routeEstimationPolicyService.calculateWeatherDelay(
+      weatherContext
+        ? {
+            condition: weatherContext.condition,
+            windSpeedMps: weatherContext.windSpeedMps,
+            rainVolumeMm: weatherContext.rainVolumeMm,
+            visibilityMeters: weatherContext.visibilityMeters,
+          }
+        : null,
     );
 
     const checkpointFactors = nearbyCheckpoints
@@ -46,6 +79,19 @@ export class RouteEstimationResultFactory {
       affectedCheckpointId: null,
       affectedIncidentId: incident.id,
     }));
+
+    const weatherFactors =
+      weatherContext && weatherImpact.delay > 0
+        ? [
+            {
+              factorType: 'weather',
+              description: `Weather impact near ${weatherContext.locationName ?? 'destination'}: ${weatherContext.description}`,
+              delayMinutes: weatherImpact.delay,
+              affectedCheckpointId: null,
+              affectedIncidentId: null,
+            },
+          ]
+        : [];
 
     const constraintFactors = [
       ...(dto.avoidCheckpoints
@@ -68,9 +114,10 @@ export class RouteEstimationResultFactory {
       }))),
     ];
 
-    const factors = [...constraintFactors, ...checkpointFactors, ...incidentFactors];
+    const factors = [...constraintFactors, ...checkpointFactors, ...incidentFactors, ...weatherFactors];
     const mobilityDelayMinutes = checkpointFactors.reduce((sum, factor) => sum + factor.delayMinutes, 0)
-      + incidentFactors.reduce((sum, factor) => sum + factor.delayMinutes, 0);
+      + incidentFactors.reduce((sum, factor) => sum + factor.delayMinutes, 0)
+      + weatherFactors.reduce((sum, factor) => sum + factor.delayMinutes, 0);
     const estimatedDurationMinutes =
       baseDurationMinutes + constraints.delay + mobilityDelayMinutes;
 
@@ -89,11 +136,27 @@ export class RouteEstimationResultFactory {
       ],
       factors,
       metadata: {
+        routeProvider: routeContext.provider,
+        routeProviderSource: routeContext.source,
+        weatherProvider: weatherContext?.provider ?? null,
+        weatherProviderSource: weatherContext?.source ?? null,
         baseDurationMinutes: Number(baseDurationMinutes.toFixed(0)),
         constraintsDelayMinutes: constraints.delay,
         mobilityDelayMinutes,
+        destinationWeather: weatherContext
+          ? {
+              locationName: weatherContext.locationName,
+              condition: weatherContext.condition,
+              description: weatherContext.description,
+              temperatureC: weatherContext.temperatureC,
+              feelsLikeC: weatherContext.feelsLikeC,
+              windSpeedMps: weatherContext.windSpeedMps,
+              rainVolumeMm: weatherContext.rainVolumeMm,
+              visibilityMeters: weatherContext.visibilityMeters,
+            }
+          : null,
         factorsAffectingRoute: factors.map((factor) => factor.description),
-        note: 'This route estimation is heuristic-based and enriched with local mobility data.',
+        note: 'This route estimation uses OpenRouteService and OpenWeatherMap enriched with local mobility data.',
       },
     };
   }

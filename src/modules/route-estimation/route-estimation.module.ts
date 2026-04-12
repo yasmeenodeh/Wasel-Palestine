@@ -11,9 +11,11 @@ import { RouteEstimationService } from './application/route-estimation.service';
 import { RouteEstimationPolicyService } from './domain/route-estimation-policy.service';
 import { RouteEstimationResultFactory } from './domain/route-estimation-result.factory';
 import { RouteEstimationQueryRepository } from './infrastructure/route-estimation-query.repository';
+import { ExternalIntelligenceModule } from '../external-intelligence/external-intelligence.module';
 
 @Module({
   imports: [
+    ExternalIntelligenceModule,
     TypeOrmModule.forFeature([
       CheckpointEntity,
       IncidentEntity,

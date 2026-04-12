@@ -7,10 +7,17 @@ import { IncidentEntity } from '../../../database/entities/incident.entity';
 import { RouteEstimationConstraintEntity } from '../../../database/entities/route-estimation-constraint.entity';
 import { RouteEstimationFactorEntity } from '../../../database/entities/route-estimation-factor.entity';
 import { RouteEstimationEntity } from '../../../database/entities/route-estimation.entity';
+import { ExternalIntelligenceService } from '../../external-intelligence/application/external-intelligence.service';
+import { GetCurrentWeatherDto } from '../../external-intelligence/dto/get-current-weather.dto';
 import { EstimateRouteDto } from '../dto/estimate-route.dto';
 import { ListRouteEstimationsDto } from '../dto/list-route-estimations.dto';
 import { RouteEstimationResultFactory } from '../domain/route-estimation-result.factory';
 import { RouteEstimationQueryRepository } from '../infrastructure/route-estimation-query.repository';
+
+type RouteEstimationConstraintRecord = {
+  constraintType: string;
+  value: string | null;
+};
 
 @Injectable()
 export class RouteEstimationService {
@@ -28,6 +35,7 @@ export class RouteEstimationService {
     private readonly locationService: LocationService,
     private readonly routeEstimationResultFactory: RouteEstimationResultFactory,
     private readonly routeEstimationQueryRepository: RouteEstimationQueryRepository,
+    private readonly externalIntelligenceService: ExternalIntelligenceService,
   ) {}
 
   list(query: ListRouteEstimationsDto) {
@@ -39,11 +47,17 @@ export class RouteEstimationService {
   }
 
   async estimateRoute(dto: EstimateRouteDto) {
-    const distanceKm = this.locationService.calculateDistanceKm(
-      dto.startLat,
-      dto.startLng,
-      dto.endLat,
-      dto.endLng,
+    const externalRoute = await this.externalIntelligenceService.getRouteDirections({
+      startLat: dto.startLat,
+      startLng: dto.startLng,
+      endLat: dto.endLat,
+      endLng: dto.endLng,
+    });
+    const externalWeather = await this.externalIntelligenceService.getCurrentWeather(
+      Object.assign(new GetCurrentWeatherDto(), {
+        lat: dto.endLat,
+        lng: dto.endLng,
+      }),
     );
 
     const checkpoints = await this.checkpointRepository.find();
@@ -81,9 +95,26 @@ export class RouteEstimationService {
 
     const result = this.routeEstimationResultFactory.create(
       dto,
-      distanceKm,
+      {
+        distanceKm: Number(externalRoute.route.distanceKm),
+        durationMinutes: Number(externalRoute.route.durationMinutes),
+        provider: 'openrouteservice',
+        source: externalRoute.source,
+      },
       nearbyCheckpoints,
       nearbyIncidents,
+      {
+        provider: externalWeather.provider,
+        source: externalWeather.source,
+        locationName: externalWeather.weather.locationName,
+        condition: externalWeather.weather.condition,
+        description: externalWeather.weather.description,
+        temperatureC: externalWeather.weather.temperatureC,
+        feelsLikeC: externalWeather.weather.feelsLikeC,
+        windSpeedMps: externalWeather.weather.windSpeedMps,
+        rainVolumeMm: externalWeather.weather.rainVolumeMm,
+        visibilityMeters: externalWeather.weather.visibilityMeters,
+      },
     );
     const routeEstimation = await this.routeEstimationRepository.save(
       this.routeEstimationRepository.create({
@@ -96,6 +127,10 @@ export class RouteEstimationService {
         baseDurationMinutes: result.baseDurationMinutes,
         constraintsDelayMinutes: result.constraintsDelayMinutes,
         mobilityDelayMinutes: result.mobilityDelayMinutes,
+        routeProvider: 'openrouteservice',
+        routeProviderSource: externalRoute.source,
+        weatherProvider: externalWeather.provider,
+        weatherProviderSource: externalWeather.source,
         metadata: result.metadata,
       }),
     );
@@ -131,19 +166,25 @@ export class RouteEstimationService {
   }
 
   async recalculate(id: string) {
-    const routeEstimation = await this.findOne(id);
+    const routeEstimation = await this.findOne(id) as {
+      startLat: string;
+      startLng: string;
+      endLat: string;
+      endLng: string;
+      constraints: RouteEstimationConstraintRecord[];
+    };
     return this.estimateRoute({
       startLat: Number(routeEstimation.startLat),
       startLng: Number(routeEstimation.startLng),
       endLat: Number(routeEstimation.endLat),
       endLng: Number(routeEstimation.endLng),
       avoidCheckpoints: routeEstimation.constraints.some(
-        (constraint) => constraint.constraintType === 'avoid_checkpoints',
+        (constraint: RouteEstimationConstraintRecord) => constraint.constraintType === 'avoid_checkpoints',
       ),
       avoidAreas: routeEstimation.constraints
-        .filter((constraint) => constraint.constraintType === 'avoid_area')
-        .map((constraint) => constraint.value ?? '')
-        .filter((value) => value.length > 0),
+        .filter((constraint: RouteEstimationConstraintRecord) => constraint.constraintType === 'avoid_area')
+        .map((constraint: RouteEstimationConstraintRecord) => constraint.value ?? '')
+        .filter((value: string) => value.length > 0),
     });
   }
 }

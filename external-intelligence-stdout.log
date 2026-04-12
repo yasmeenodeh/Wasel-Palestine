@@ -1,0 +1,90 @@
+
+> wasel-palestine-api@0.1.0 start
+> nest start
+
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +28ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mThrottlerModule dependencies initialized[39m[38;5;3m +80ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmCoreModule dependencies initialized[39m[38;5;3m +57ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReferenceDataModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mExternalIntelligenceModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuthModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAlertsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuditLogsModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mCheckpointsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReportsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mIncidentsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mRouteEstimationModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAuthController {/api/auth} (version: 1):[39m[38;5;3m +38ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/register, POST} (version: 1) route[39m[38;5;3m +4ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/login, POST} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/refresh, POST} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/logout, POST} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/me, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAlertsController {/api/alerts} (version: 1):[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/alerts/subscriptions, GET} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/alerts/subscriptions, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/alerts/subscriptions/:id, PATCH} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/alerts/subscriptions/:id/deactivate, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/alerts/subscriptions/:id/reactivate, POST} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/alerts, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/alerts/:id/read, POST} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAuditLogsController {/api/audit-logs} (version: 1):[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/audit-logs, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mCheckpointsController {/api/checkpoints} (version: 1):[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/checkpoints, GET} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/checkpoints/:id, GET} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/checkpoints, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/checkpoints/:id, PATCH} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/checkpoints/:id/status-history, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/checkpoints/:id/status-history, POST} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mExternalIntelligenceController {/api/external-intelligence} (version: 1):[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/external-intelligence/geocode/search, GET} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/external-intelligence/weather/current, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mIncidentsController {/api/incidents} (version: 1):[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/incidents, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/incidents/:id, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/incidents, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/incidents/:id, PATCH} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/incidents/:id/verify, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/incidents/:id/close, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/incidents/:id/status-history, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mReferenceDataController {/api/reference-data} (version: 1):[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reference-data/incident-categories, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reference-data/incident-severities, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reference-data/incident-statuses, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reference-data/roles, GET} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mReportsController {/api/reports} (version: 1):[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/top-contributors, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id, GET} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/votes, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/votes, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/images, GET} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/images, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/moderation-actions, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/approve, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/reject, POST} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/flag-abuse, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/merge, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports/:id/convert-to-incident, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mRouteEstimationController {/api/route-estimation} (version: 1):[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/route-estimation, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/route-estimation/:id, GET} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/route-estimation/estimate, POST} (version: 1) route[39m[38;5;3m +0ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/route-estimation/:id/recalculate, POST} (version: 1) route[39m[38;5;3m +1ms[39m
+[32m[Nest] 25128  - [39m04/12/2026, 1:13:03 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +3ms[39m
