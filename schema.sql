@@ -346,6 +346,40 @@ CREATE TABLE IF NOT EXISTS user_points_ledger (
         ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS external_api_caches (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    provider VARCHAR(50) NOT NULL,
+    endpoint VARCHAR(100) NOT NULL,
+    cache_key VARCHAR(191) NOT NULL,
+    request_url VARCHAR(500) NOT NULL,
+    response_payload JSON NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_external_api_caches_provider_endpoint_cache_key (provider, endpoint, cache_key),
+    KEY idx_external_api_caches_expires_at (expires_at),
+    KEY idx_external_api_caches_provider_endpoint (provider, endpoint)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS external_api_request_logs (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    provider VARCHAR(50) NOT NULL,
+    endpoint VARCHAR(100) NOT NULL,
+    cache_key VARCHAR(191) NULL,
+    request_url VARCHAR(500) NOT NULL,
+    status_code INT UNSIGNED NULL,
+    duration_ms INT UNSIGNED NULL,
+    was_cached TINYINT(1) NOT NULL DEFAULT 0,
+    was_successful TINYINT(1) NOT NULL DEFAULT 1,
+    error_message VARCHAR(255) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_external_api_request_logs_provider_created_at (provider, created_at),
+    KEY idx_external_api_request_logs_endpoint_created_at (endpoint, created_at),
+    KEY idx_external_api_request_logs_was_cached (was_cached)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS report_moderation_actions (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     report_id BIGINT UNSIGNED NOT NULL,
@@ -438,6 +472,10 @@ CREATE TABLE IF NOT EXISTS route_estimations (
     base_duration_minutes INT UNSIGNED NOT NULL,
     constraints_delay_minutes INT UNSIGNED NOT NULL DEFAULT 0,
     mobility_delay_minutes INT UNSIGNED NOT NULL DEFAULT 0,
+    route_provider VARCHAR(50) NULL,
+    route_provider_source VARCHAR(30) NULL,
+    weather_provider VARCHAR(50) NULL,
+    weather_provider_source VARCHAR(30) NULL,
     metadata JSON NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -445,6 +483,12 @@ CREATE TABLE IF NOT EXISTS route_estimations (
     KEY idx_route_estimations_duration (estimated_duration_minutes),
     KEY idx_route_estimations_distance (estimated_distance_km)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE route_estimations
+    ADD COLUMN IF NOT EXISTS route_provider VARCHAR(50) NULL AFTER mobility_delay_minutes,
+    ADD COLUMN IF NOT EXISTS route_provider_source VARCHAR(30) NULL AFTER route_provider,
+    ADD COLUMN IF NOT EXISTS weather_provider VARCHAR(50) NULL AFTER route_provider_source,
+    ADD COLUMN IF NOT EXISTS weather_provider_source VARCHAR(30) NULL AFTER weather_provider;
 
 CREATE TABLE IF NOT EXISTS route_estimation_constraints (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

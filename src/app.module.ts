@@ -8,6 +8,8 @@ import { AlertEntity } from './database/entities/alert.entity';
 import { AuditLogEntity } from './database/entities/audit-log.entity';
 import { CheckpointStatusHistoryEntity } from './database/entities/checkpoint-status-history.entity';
 import { CheckpointEntity } from './database/entities/checkpoint.entity';
+import { ExternalApiCacheEntity } from './database/entities/external-api-cache.entity';
+import { ExternalApiRequestLogEntity } from './database/entities/external-api-request-log.entity';
 import { IncidentCategoryEntity } from './database/entities/incident-category.entity';
 import { IncidentEntity } from './database/entities/incident.entity';
 import { IncidentSeverityEntity } from './database/entities/incident-severity.entity';
@@ -28,6 +30,7 @@ import { AlertsModule } from './modules/alerts/alerts.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { CheckpointsModule } from './modules/checkpoints/checkpoints.module';
+import { ExternalIntelligenceModule } from './modules/external-intelligence/external-intelligence.module';
 import { IncidentsModule } from './modules/incidents/incidents.module';
 import { ReferenceDataModule } from './modules/reference-data/reference-data.module';
 import { ReportsModule } from './modules/reports/reports.module';
@@ -60,6 +63,8 @@ import { RouteEstimationModule } from './modules/route-estimation/route-estimati
         entities: [
           RoleEntity,
           UserEntity,
+          ExternalApiCacheEntity,
+          ExternalApiRequestLogEntity,
           CheckpointEntity,
           CheckpointStatusHistoryEntity,
           IncidentCategoryEntity,
@@ -88,6 +93,7 @@ import { RouteEstimationModule } from './modules/route-estimation/route-estimati
     AlertsModule,
     AuditLogsModule,
     CheckpointsModule,
+    ExternalIntelligenceModule,
     IncidentsModule,
     ReferenceDataModule,
     ReportsModule,
