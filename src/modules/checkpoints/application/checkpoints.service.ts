@@ -108,4 +108,14 @@ export class CheckpointsService {
     await this.findOne(checkpointId);
     return this.checkpointStatusHistoryService.list(checkpointId);
   }
+
+  async remove(id: string) {
+    const checkpoint = await this.findOne(id);
+    await this.checkpointRepository.remove(checkpoint);
+
+    return {
+      id,
+      deleted: true,
+    };
+  }
 }

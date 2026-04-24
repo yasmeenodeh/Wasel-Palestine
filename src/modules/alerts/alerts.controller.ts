@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { RoleHeaderGuard } from '../../common/guards/role-header.guard';
@@ -55,6 +55,13 @@ export class AlertsController {
   @Roles(UserRole.ADMIN, UserRole.MODERATOR, UserRole.CITIZEN)
   reactivateSubscription(@Param('id', ParseIntPipe) id: number, @Req() req: RequestWithUser) {
     return this.alertsService.reactivateSubscription(id.toString(), req.user?.id ?? 0);
+  }
+
+  @Delete('subscriptions/:id')
+  @UseGuards(RoleHeaderGuard)
+  @Roles(UserRole.ADMIN, UserRole.MODERATOR, UserRole.CITIZEN)
+  deleteSubscription(@Param('id', ParseIntPipe) id: number, @Req() req: RequestWithUser) {
+    return this.alertsService.deleteSubscription(id.toString(), req.user?.id ?? 0);
   }
 
   @Get()

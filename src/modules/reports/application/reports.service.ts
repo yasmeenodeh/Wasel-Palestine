@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, IsNull, Not, Repository } from 'typeorm';
+import { UserRole } from '../../../common/enums/user-role.enum';
 import { AuditLogEntity } from '../../../database/entities/audit-log.entity';
 import { IncidentEntity } from '../../../database/entities/incident.entity';
 import { IncidentStatusHistoryEntity } from '../../../database/entities/incident-status-history.entity';
@@ -33,6 +34,7 @@ import { ReportPointsService } from '../domain/report-points.service';
 import { ReportTrustService } from '../domain/report-trust.service';
 import { ReportContributorsQueryRepository } from '../infrastructure/report-contributors-query.repository';
 import { ReportsQueryRepository } from '../infrastructure/reports-query.repository';
+import { IncidentEmergencyDispatchService } from '../../incidents/application/incident-emergency-dispatch.service';
 
 @Injectable()
 export class ReportsService {
@@ -65,6 +67,7 @@ export class ReportsService {
     private readonly reportImageVisionService: ReportImageVisionService,
     private readonly reportPointsService: ReportPointsService,
     private readonly reportTrustService: ReportTrustService,
+    private readonly incidentEmergencyDispatchService: IncidentEmergencyDispatchService,
   ) {}
 
   list(query: ListReportsDto) {
@@ -424,10 +427,69 @@ export class ReportsService {
         sourceReportId: reportId,
       },
     });
+    await this.incidentEmergencyDispatchService.syncForIncident(savedIncident.id);
 
     return {
       report: await this.findOne(reportId),
       incident: savedIncident,
+    };
+  }
+
+  async deleteImage(
+    reportId: string,
+    imageId: string,
+    actorUserId: number,
+    actorRole: UserRole,
+  ) {
+    const report = await this.findOne(reportId);
+    const image = await this.reportImageRepository.findOne({
+      where: {
+        id: imageId,
+        reportId,
+      },
+    });
+
+    if (!image) {
+      throw new NotFoundException(`Report image ${imageId} was not found.`);
+    }
+
+    const canManageAny = actorRole === UserRole.ADMIN || actorRole === UserRole.MODERATOR;
+    const ownsImage = image.uploadedBy === actorUserId.toString();
+    const ownsReport = report.submittedBy === actorUserId.toString();
+
+    if (!canManageAny && !ownsImage && !ownsReport) {
+      throw new BadRequestException('You can only delete your own report images.');
+    }
+
+    await this.reportImageRepository.remove(image);
+    await this.refreshReportTrust(reportId);
+
+    return {
+      id: imageId,
+      reportId,
+      deleted: true,
+    };
+  }
+
+  async remove(reportId: string, actorUserId: number, actorRole: UserRole) {
+    const report = await this.findOne(reportId);
+    const canManageAny = actorRole === UserRole.ADMIN || actorRole === UserRole.MODERATOR;
+
+    if (!canManageAny) {
+      if (report.submittedBy !== actorUserId.toString()) {
+        throw new BadRequestException('You can only delete your own reports.');
+      }
+
+      if (!['pending', 'under_review'].includes(report.status)) {
+        throw new BadRequestException('Only pending or under-review reports can be deleted by the submitter.');
+      }
+    }
+
+    await this.reportRepository.remove(report);
+
+    return {
+      id: reportId,
+      deleted: true,
     };
   }
 

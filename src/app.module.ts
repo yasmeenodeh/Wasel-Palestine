@@ -8,9 +8,11 @@ import { AlertEntity } from './database/entities/alert.entity';
 import { AuditLogEntity } from './database/entities/audit-log.entity';
 import { CheckpointStatusHistoryEntity } from './database/entities/checkpoint-status-history.entity';
 import { CheckpointEntity } from './database/entities/checkpoint.entity';
+import { EmergencyServiceCenterEntity } from './database/entities/emergency-service-center.entity';
 import { ExternalApiCacheEntity } from './database/entities/external-api-cache.entity';
 import { ExternalApiRequestLogEntity } from './database/entities/external-api-request-log.entity';
 import { IncidentCategoryEntity } from './database/entities/incident-category.entity';
+import { IncidentEmergencyDispatchEntity } from './database/entities/incident-emergency-dispatch.entity';
 import { IncidentEntity } from './database/entities/incident.entity';
 import { IncidentSeverityEntity } from './database/entities/incident-severity.entity';
 import { IncidentStatusHistoryEntity } from './database/entities/incident-status-history.entity';
@@ -67,7 +69,9 @@ import { RouteEstimationModule } from './modules/route-estimation/route-estimati
           ExternalApiRequestLogEntity,
           CheckpointEntity,
           CheckpointStatusHistoryEntity,
+          EmergencyServiceCenterEntity,
           IncidentCategoryEntity,
+          IncidentEmergencyDispatchEntity,
           IncidentSeverityEntity,
           IncidentStatusEntity,
           IncidentEntity,

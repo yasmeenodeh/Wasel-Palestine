@@ -126,6 +126,21 @@ export class AlertsService {
     return this.alertSubscriptionRepository.save(subscription);
   }
 
+  async deleteSubscription(id: string, actorUserId: number) {
+    const subscription = await this.findSubscription(id);
+
+    if (subscription.userId !== actorUserId.toString()) {
+      throw new BadRequestException('You can only delete your own alert subscriptions.');
+    }
+
+    await this.alertSubscriptionRepository.remove(subscription);
+
+    return {
+      id,
+      deleted: true,
+    };
+  }
+
   async markAsRead(id: string, actorUserId: number) {
     const alert = await this.alertRepository.findOne({
       where: { id },

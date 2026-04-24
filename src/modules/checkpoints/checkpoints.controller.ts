@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { RoleHeaderGuard } from '../../common/guards/role-header.guard';
@@ -60,5 +60,12 @@ export class CheckpointsController {
     @Req() req: RequestWithUser,
   ) {
     return this.checkpointsService.addStatusHistory(id.toString(), dto, req.user?.id);
+  }
+
+  @Delete(':id')
+  @UseGuards(RoleHeaderGuard)
+  @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.checkpointsService.remove(id.toString());
   }
 }

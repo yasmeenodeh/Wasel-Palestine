@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { RoleHeaderGuard } from '../../common/guards/role-header.guard';
+import { RequestUser } from '../../common/types/request-user.type';
 import { ReportsService } from './application/reports.service';
 import { ApproveReportDto } from './dto/approve-report.dto';
 import { AttachReportImageDto } from './dto/attach-report-image.dto';
@@ -15,9 +16,7 @@ import { RejectReportDto } from './dto/reject-report.dto';
 import { VoteReportDto } from './dto/vote-report.dto';
 
 type RequestWithUser = {
-  user?: {
-    id: number;
-  };
+  user?: RequestUser;
 };
 
 @Controller({ path: 'reports', version: '1' })
@@ -88,6 +87,22 @@ export class ReportsController {
     return this.reportsService.attachImage(id.toString(), dto, req.user?.id ?? 0);
   }
 
+  @Delete(':reportId/images/:imageId')
+  @UseGuards(RoleHeaderGuard)
+  @Roles(UserRole.ADMIN, UserRole.MODERATOR, UserRole.CITIZEN)
+  deleteImage(
+    @Param('reportId', ParseIntPipe) reportId: number,
+    @Param('imageId', ParseIntPipe) imageId: number,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.reportsService.deleteImage(
+      reportId.toString(),
+      imageId.toString(),
+      req.user?.id ?? 0,
+      req.user?.role ?? UserRole.CITIZEN,
+    );
+  }
+
   @Get(':id/moderation-actions')
   @UseGuards(RoleHeaderGuard)
   @Roles(UserRole.ADMIN, UserRole.MODERATOR)
@@ -148,5 +163,16 @@ export class ReportsController {
     @Req() req: RequestWithUser,
   ) {
     return this.reportsService.convertToIncident(id.toString(), dto, req.user?.id ?? 0);
+  }
+
+  @Delete(':id')
+  @UseGuards(RoleHeaderGuard)
+  @Roles(UserRole.ADMIN, UserRole.MODERATOR, UserRole.CITIZEN)
+  remove(@Param('id', ParseIntPipe) id: number, @Req() req: RequestWithUser) {
+    return this.reportsService.remove(
+      id.toString(),
+      req.user?.id ?? 0,
+      req.user?.role ?? UserRole.CITIZEN,
+    );
   }
 }

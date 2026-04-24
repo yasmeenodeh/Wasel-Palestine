@@ -68,17 +68,18 @@ Database explanation PDF:
 
 - [advanced_wasel_palestine.pdf](./advanced_wasel_palestine.pdf)
 
-Current database coverage includes `23` tables across authentication, incidents, reporting, alerts, route estimation, gamification, image analysis, and external API caching/logging.
+Current database coverage includes `25` tables across authentication, incidents, reporting, alerts, route estimation, gamification, image analysis, emergency dispatching, and external API caching/logging.
 
 Main entity groups:
 
 - Identity and authorization: `roles`, `users`
-- Mobility monitoring: `checkpoints`, `checkpoint_status_history`, `incidents`, `incident_status_history`
+- Mobility monitoring: `checkpoints`, `checkpoint_status_history`, `incidents`, `incident_status_history`, `incident_emergency_dispatches`
 - Reference data: `incident_categories`, `incident_severities`, `incident_statuses`
 - Crowdsourced reporting: `reports`, `report_votes`, `report_moderation_actions`
 - AI vision and media support: `report_images`, `report_image_analyses`
 - Gamification: `user_points_ledger`
 - Alerts: `alert_subscriptions`, `alerts`
+- Emergency response: `emergency_service_centers`
 - Route intelligence: `route_estimations`, `route_estimation_constraints`, `route_estimation_factors`
 - Auditing: `audit_logs`
 - External integration support: `external_api_caches`, `external_api_request_logs`
@@ -102,7 +103,8 @@ Design decisions:
 
 Examples of resource design:
 
-- `incidents` supports listing, filtering, sorting, verification, and closing
+- `incidents` supports listing, filtering, sorting, verification, closing, and nearest emergency dispatch retrieval
+- `incidents` automatically dispatches nearest police, ambulance, and hospital centers when the incident is classified as a road accident
 - `reports` supports creation, voting, moderation, image upload, trust scoring, and leaderboard retrieval
 - `route-estimation` supports estimation, retrieval, and recalculation
 - `alerts` supports subscriptions, alert listing, and state updates
@@ -426,6 +428,30 @@ Body:
 }
 ```
 
+#### `DELETE http://localhost:3000/api/v1/checkpoints/:id`
+
+Roles:
+
+- `admin`
+- `moderator`
+
+Example:
+
+- `http://localhost:3000/api/v1/checkpoints/1`
+
+Header:
+
+```json
+{
+  "Authorization": "Bearer <admin_or_moderator_access_token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+- no body
+
 ### Incidents
 
 #### `GET http://localhost:3000/api/v1/incidents`
@@ -576,6 +602,53 @@ Header:
 
 ```json
 {
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+- no body
+
+#### `GET http://localhost:3000/api/v1/incidents/:id/emergency-dispatches`
+
+Example:
+
+- `http://localhost:3000/api/v1/incidents/2/emergency-dispatches`
+
+Header:
+
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+- no body
+
+Notes:
+
+- For road accidents, the system links the incident to the nearest active `police`, `ambulance`, and `hospital` centers.
+- Dispatch rows are refreshed automatically on incident creation, update, verification, and report-to-incident conversion.
+
+#### `DELETE http://localhost:3000/api/v1/incidents/:id`
+
+Roles:
+
+- `admin`
+- `moderator`
+
+Example:
+
+- `http://localhost:3000/api/v1/incidents/2`
+
+Header:
+
+```json
+{
+  "Authorization": "Bearer <admin_or_moderator_access_token>",
   "Content-Type": "application/json"
 }
 ```
@@ -747,6 +820,21 @@ Body:
 }
 ```
 
+#### `DELETE http://localhost:3000/api/v1/reports/:reportId/images/:imageId`
+
+Header:
+
+```json
+{
+  "Authorization": "Bearer <access_token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+- no body
+
 #### `GET http://localhost:3000/api/v1/reports/:id/moderation-actions`
 
 Roles:
@@ -866,6 +954,26 @@ Body:
 }
 ```
 
+#### `DELETE http://localhost:3000/api/v1/reports/:id`
+
+Header:
+
+```json
+{
+  "Authorization": "Bearer <access_token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+- no body
+
+Rules:
+
+- `admin` and `moderator` can delete any report.
+- `citizen` can delete only their own reports while status is `pending` or `under_review`.
+
 ### Alerts
 
 #### `GET http://localhost:3000/api/v1/alerts/subscriptions`
@@ -943,6 +1051,21 @@ Body:
 
 - no body
 
+#### `DELETE http://localhost:3000/api/v1/alerts/subscriptions/:id`
+
+Header:
+
+```json
+{
+  "Authorization": "Bearer <access_token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+- no body
+
 #### `GET http://localhost:3000/api/v1/alerts`
 
 Header:
@@ -979,7 +1102,7 @@ Body:
 
 ### Audit Logs
 
-#### `GET http://localhost:3000/api/v1/audit-logs`
+#### `GET ew`
 
 Roles:
 
@@ -1193,7 +1316,6 @@ Database verification included:
 - checking generated tables
 - checking inserted and updated rows
 - verifying consistency between API behavior and stored data
-- verifying local MySQL state using `mysql.exe`
 
 Performance testing was executed using `k6`.
 
