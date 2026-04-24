@@ -214,6 +214,69 @@ CREATE TABLE IF NOT EXISTS incident_status_history (
         ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS emergency_service_centers (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(150) NOT NULL,
+    service_type ENUM('police', 'ambulance', 'hospital') NOT NULL,
+    latitude DECIMAL(10,7) NOT NULL,
+    longitude DECIMAL(10,7) NOT NULL,
+    contact_number VARCHAR(50) NULL,
+    geographic_area VARCHAR(255) NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_emergency_service_centers_name_type (name, service_type),
+    KEY idx_emergency_service_centers_service_type (service_type),
+    KEY idx_emergency_service_centers_location (latitude, longitude),
+    KEY idx_emergency_service_centers_is_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS incident_emergency_dispatches (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    incident_id BIGINT UNSIGNED NOT NULL,
+    emergency_service_center_id BIGINT UNSIGNED NOT NULL,
+    service_type ENUM('police', 'ambulance', 'hospital') NOT NULL,
+    status ENUM('pending', 'dispatched', 'acknowledged') NOT NULL DEFAULT 'dispatched',
+    distance_km DECIMAL(8,2) NOT NULL,
+    payload JSON NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    dispatched_at TIMESTAMP NULL DEFAULT NULL,
+    acknowledged_at TIMESTAMP NULL DEFAULT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_incident_dispatch_incident_center (incident_id, emergency_service_center_id),
+    KEY idx_incident_dispatch_incident_id (incident_id),
+    KEY idx_incident_dispatch_center_id (emergency_service_center_id),
+    KEY idx_incident_dispatch_service_type (service_type),
+    KEY idx_incident_dispatch_status (status),
+    CONSTRAINT fk_incident_dispatch_incident
+        FOREIGN KEY (incident_id) REFERENCES incidents (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_incident_dispatch_center
+        FOREIGN KEY (emergency_service_center_id) REFERENCES emergency_service_centers (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO emergency_service_centers (name, service_type, latitude, longitude, contact_number, geographic_area, is_active)
+VALUES
+    ('Ramallah Police Center', 'police', 31.9038, 35.2034, '100', 'Ramallah', 1),
+    ('Ramallah Ambulance Center', 'ambulance', 31.9074, 35.2044, '101', 'Ramallah', 1),
+    ('Ramallah Government Hospital', 'hospital', 31.9102, 35.2061, '102', 'Ramallah', 1),
+    ('Nablus Police Center', 'police', 32.2211, 35.2544, '100', 'Nablus', 1),
+    ('Nablus Ambulance Center', 'ambulance', 32.2190, 35.2610, '101', 'Nablus', 1),
+    ('Nablus Rafidia Hospital', 'hospital', 32.2222, 35.2384, '102', 'Nablus', 1),
+    ('Hebron Police Center', 'police', 31.5326, 35.0998, '100', 'Hebron', 1),
+    ('Hebron Ambulance Center', 'ambulance', 31.5313, 35.1032, '101', 'Hebron', 1),
+    ('Hebron Government Hospital', 'hospital', 31.5296, 35.1024, '102', 'Hebron', 1)
+ON DUPLICATE KEY UPDATE
+    latitude = VALUES(latitude),
+    longitude = VALUES(longitude),
+    contact_number = VALUES(contact_number),
+    geographic_area = VALUES(geographic_area),
+    is_active = VALUES(is_active);
+
 CREATE TABLE IF NOT EXISTS reports (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     submitted_by BIGINT UNSIGNED NULL,

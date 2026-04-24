@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { IncidentEntity } from '../../../database/entities/incident.entity';
 import { IncidentStatusHistoryEntity } from '../../../database/entities/incident-status-history.entity';
 import { AlertsService } from '../../alerts/application/alerts.service';
+import { IncidentEmergencyDispatchService } from './incident-emergency-dispatch.service';
 import { CloseIncidentDto } from '../dto/close-incident.dto';
 import { CreateIncidentDto } from '../dto/create-incident.dto';
 import { ListIncidentsDto } from '../dto/list-incidents.dto';
@@ -22,6 +23,7 @@ export class IncidentsService {
     private readonly incidentsQueryRepository: IncidentsQueryRepository,
     private readonly incidentStatusService: IncidentStatusService,
     private readonly alertsService: AlertsService,
+    private readonly incidentEmergencyDispatchService: IncidentEmergencyDispatchService,
   ) {}
 
   list(query: ListIncidentsDto) {
@@ -69,6 +71,7 @@ export class IncidentsService {
 
     const savedIncident = await this.incidentRepository.save(incident);
     await this.writeStatusHistory(savedIncident.id, null, pendingStatus.id, actorUserId, 'Incident created');
+    await this.incidentEmergencyDispatchService.syncForIncident(savedIncident.id);
     return this.findOne(savedIncident.id);
   }
 
@@ -86,6 +89,7 @@ export class IncidentsService {
     }
 
     await this.incidentRepository.save(incident);
+    await this.incidentEmergencyDispatchService.syncForIncident(id);
     return this.findOne(id);
   }
 
@@ -107,6 +111,7 @@ export class IncidentsService {
       dto.changeReason ?? 'Incident verified',
     );
     await this.alertsService.createAlertsForVerifiedIncident(incident.id);
+    await this.incidentEmergencyDispatchService.syncForIncident(incident.id);
 
     return this.findOne(id);
   }
@@ -144,6 +149,20 @@ export class IncidentsService {
       },
       order: { changedAt: 'DESC' },
     });
+  }
+
+  async getEmergencyDispatches(incidentId: string) {
+    return this.incidentEmergencyDispatchService.listByIncident(incidentId);
+  }
+
+  async remove(id: string) {
+    const incident = await this.findOne(id);
+    await this.incidentRepository.remove(incident);
+
+    return {
+      id,
+      deleted: true,
+    };
   }
 
   private writeStatusHistory(

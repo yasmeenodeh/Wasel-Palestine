@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { RoleHeaderGuard } from '../../common/guards/role-header.guard';
@@ -68,5 +68,17 @@ export class IncidentsController {
   @Get(':id/status-history')
   getStatusHistory(@Param('id', ParseIntPipe) id: number) {
     return this.incidentsService.getStatusHistory(id.toString());
+  }
+
+  @Get(':id/emergency-dispatches')
+  getEmergencyDispatches(@Param('id', ParseIntPipe) id: number) {
+    return this.incidentsService.getEmergencyDispatches(id.toString());
+  }
+
+  @Delete(':id')
+  @UseGuards(RoleHeaderGuard)
+  @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.incidentsService.remove(id.toString());
   }
 }

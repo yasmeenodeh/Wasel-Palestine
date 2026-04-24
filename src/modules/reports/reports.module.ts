@@ -17,11 +17,13 @@ import { ReportImageVisionService } from './domain/report-image-vision.service';
 import { ReportPointsService } from './domain/report-points.service';
 import { ReportTrustService } from './domain/report-trust.service';
 import { UserPointsLedgerEntity } from '../../database/entities/user-points-ledger.entity';
+import { IncidentsModule } from '../incidents/incidents.module';
 import { ReportContributorsQueryRepository } from './infrastructure/report-contributors-query.repository';
 import { ReportsQueryRepository } from './infrastructure/reports-query.repository';
 
 @Module({
   imports: [
+    IncidentsModule,
     TypeOrmModule.forFeature([
       ReportEntity,
       ReportImageEntity,
