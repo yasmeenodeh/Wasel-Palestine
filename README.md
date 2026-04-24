@@ -1102,7 +1102,7 @@ Body:
 
 ### Audit Logs
 
-#### `GET ew`
+#### `GET http://localhost:3000/api/v1/audit-logs`
 
 Roles:
 
